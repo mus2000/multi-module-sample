@@ -8,5 +8,9 @@ public class App2 {
 		app1.method1();
 	}
 	
+	public void method2B() {
+		
+	}
+	
 }
 
