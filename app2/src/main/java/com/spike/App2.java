@@ -9,7 +9,8 @@ public class App2 {
 	}
 	
 	public void method2B() {
-		System.out.println("method 2 B");
+		System.out.println("method 2 B2");
+		System.out.println("method 2 B2");
 	}
 	
 }
