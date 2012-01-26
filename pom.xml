@@ -5,14 +5,14 @@
     <version>1.12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>parent</name>
-    <scm>
+    
+	<scm>
         <connection>scm:svn:file:///Software/nobackup/svnrepo/multimodule/trunk</connection>
         <developerConnection>scm:svn:file:///Software/nobackup/svnrepo/multimodule/trunk</developerConnection>
     </scm>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <distributionManagement>
+    
+    
+	<distributionManagement>
         <snapshotRepository>
             <id>ui-snapshot</id>
             <uniqueVersion>true</uniqueVersion>
@@ -24,7 +24,44 @@
             <url>http://localhost:8080/nexus/content/repositories/staging/</url>
         </repository>
     </distributionManagement>
-    <build>
+	
+	<properties>
+		<build.root>${env.STARLINGROOT}</build.root>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<skip.unittest>false</skip.unittest>
+		
+		<!-- MAVEN REPO -->
+		<maven.repo.host>http://localhost:8080/archiva/repository</maven.repo.host>
+		<snapshotUpdatePolicy>always</snapshotUpdatePolicy>
+		
+		<!-- MISC	-->
+		<com.bp.traf.version>${project.version}</com.bp.traf.version>
+		<build.number>default</build.number>
+		<check.prefix>working</check.prefix>
+		<parent.root.location>${root.home.location}</parent.root.location>
+		<versionone.user>maven</versionone.user>
+		<versionone.password>maven</versionone.password>
+		
+		<!-- SCM -->
+		<git.connection></git.connection>
+		<git.url></git.url>
+		<repository.name></repository.name>
+		
+		<!-- JAVA	-->
+		<java.version>1.6</java.version>
+		<scala.version>2.9.1</scala.version>
+		<target.jdk>1.6</target.jdk>
+		<compileSource>1.6</compileSource>
+		
+		<!-- DATABASE	-->
+		
+		<!-- libraries versions	-->
+		<scala.version>2.9.1</scala.version>
+		<jfree.version>1.0.0</jfree.version>
+		
+	</properties>
+    
+	<build>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -32,27 +69,1190 @@
                     <artifactId>maven-scm-plugin</artifactId>
                     <version>1.2</version>
                 </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0-beta-9</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <tagBase>file:///Software/nobackup/svnrepo/multimodule/releases/</tagBase>
-                    <releaseProfiles>multimodule-tag-modules</releaseProfiles>
-                </configuration>
-            </plugin>
+    
+				<plugin>
+				  <artifactId>maven-antrun-plugin</artifactId>
+				  <version>1.3</version>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-assembly-plugin</artifactId>
+				  <version>2.2-beta-5</version>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-dependency-plugin</artifactId>
+				  <version>2.1</version>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-release-plugin</artifactId>
+				  <version>2.0</version>
+				</plugin>
+				<plugin>
+				  <groupId>org.scala-tools</groupId>
+				  <artifactId>maven-scala-plugin</artifactId>
+				  <version>2.9.1</version>
+				  <executions>
+					<execution>
+					  <id>cc</id>
+					  <goals>
+						<goal>compile</goal>
+						<goal>testCompile</goal>
+					  </goals>
+					  <configuration>
+						<jvmArgs>
+						  <jvmArg>-Xms512m</jvmArg>
+						  <jvmArg>-Xmx4068m</jvmArg>
+						  <jvmArg>-XX:MaxPermSize=1024m</jvmArg>
+						  <jvmArg>-XX:ReservedCodeCacheSize=1024m</jvmArg>
+						  <jvmArg>-XX:+CMSClassUnloadingEnabled</jvmArg>
+						</jvmArgs>
+						<useFsc>true</useFsc>
+						<once>true</once>
+					  </configuration>
+					</execution>
+				  </executions>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-compiler-plugin</artifactId>
+				  <version>2.3.2</version>
+				  <configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				  </configuration>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-surefire-plugin</artifactId>
+				  <version>2.11</version>
+				  <executions>
+					<execution>
+					  <id>scala-tests</id>
+					  <goals>
+						<goal>test</goal>
+					  </goals>
+					  <configuration>
+						<parallel>methods</parallel>
+						<threadCount>4</threadCount>
+					  </configuration>
+					</execution>
+					<execution>
+					  <id>default-test</id>
+					  <configuration>
+						<skipTests>true</skipTests>
+						<parallel>methods</parallel>
+						<threadCount>4</threadCount>
+						<suiteXmlFiles>
+						  <suiteXmlFile>target/test-classes/test-suites/all-tests.xml</suiteXmlFile>
+						</suiteXmlFiles>
+						<maven.test.failure.ignore>true</maven.test.failure.ignore>
+					  </configuration>
+					</execution>
+				  </executions>
+				  <configuration>
+					<parallel>methods</parallel>
+					<threadCount>4</threadCount>
+				  </configuration>
+				</plugin>
+				
+				<plugin>
+				  <artifactId>maven-jar-plugin</artifactId>
+				  <version>2.3.2</version>
+				</plugin>
+			  </plugins>
+			</pluginManagement>
+			
+			<plugins>
+			  <plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+				  <execution>
+					<id>default-clean</id>
+					<phase>clean</phase>
+					<goals>
+					  <goal>clean</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin>
+			  <plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.3.1</version>
+				<executions>
+				  <execution>
+					<id>default-install</id>
+					<phase>install</phase>
+					<goals>
+					  <goal>install</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin>
+			  <plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+				  <execution>
+					<id>default-deploy</id>
+					<phase>deploy</phase>
+					<goals>
+					  <goal>deploy</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin>
+			  <plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>2.0.1</version>
+				<executions>
+				  <execution>
+					<id>default-site</id>
+					<phase>site</phase>
+					<goals>
+					  <goal>site</goal>
+					</goals>
+					<configuration>
+					  <outputDirectory>C:\projects\trafigura\CODE\starling\target\site</outputDirectory>
+					  <reportPlugins>
+						<reportPlugin>
+						  <groupId>org.apache.maven.plugins</groupId>
+						  <artifactId>maven-project-info-reports-plugin</artifactId>
+						</reportPlugin>
+					  </reportPlugins>
+					</configuration>
+				  </execution>
+				  <execution>
+					<id>default-deploy</id>
+					<phase>site-deploy</phase>
+					<goals>
+					  <goal>deploy</goal>
+					</goals>
+					<configuration>
+					  <outputDirectory>C:\projects\trafigura\CODE\starling\target\site</outputDirectory>
+					  <reportPlugins>
+						<reportPlugin>
+						  <groupId>org.apache.maven.plugins</groupId>
+						  <artifactId>maven-project-info-reports-plugin</artifactId>
+						</reportPlugin>
+					  </reportPlugins>
+					</configuration>
+				  </execution>
+				</executions>
+				<configuration>
+				  <outputDirectory>C:\projects\trafigura\CODE\starling\target\site</outputDirectory>
+				  <reportPlugins>
+					<reportPlugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-project-info-reports-plugin</artifactId>
+					</reportPlugin>
+				  </reportPlugins>
+				</configuration>
+			  </plugin>
+     		  <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.0-beta-9</version>
+					<inherited>true</inherited>
+					<configuration>
+						<tagBase>file:///Software/nobackup/svnrepo/multimodule/releases/</tagBase>
+						<releaseProfiles>multimodule-tag-modules</releaseProfiles>
+					</configuration>
+				</plugin>
         </plugins>
     </build>
+	
+	<!-- dependencies exclussions and versions -->
+	<dependencyManagement>
+	
+		<dependencies>
+		
+			<dependency>
+				<groupId>de.friedenhagen.multimodule</groupId>
+				<artifactId>parent</artifactId>
+				<version>1.12-SNAPSHOT</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>de.friedenhagen.multimodule</groupId>
+				<artifactId>core</artifactId>
+				<version>1.12-SNAPSHOT</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>de.friedenhagen.multimodule</groupId>
+				<artifactId>app1</artifactId>
+				<version>1.12-SNAPSHOT</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>de.friedenhagen.multimodule</groupId>
+				<artifactId>app2</artifactId>
+				<version>1.12-SNAPSHOT</version>
+			</dependency>
+		
+		
+			<!-- starling modules -->
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>utils</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>utils</artifactId>
+				<scope>test</scope>
+				<classifier>tests</classifier>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>manager</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>concurrent</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>quantity</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>bouncyrmi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>quantity</artifactId>
+				<classifier>tests</classifier>
+				<scope>test</scope>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>daterange</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>daterange</artifactId>
+				<classifier>tests</classifier>
+				<scope>test</scope>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>pivot</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>props</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>osgimanager</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>maths</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>pivot-utils</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>auth</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>rabbit-event-viewer-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>browser-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>singleclasspathmanager</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>loopyxl</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>gui-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>browser</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>titan-return-types</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>curves</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>curves</artifactId>
+				<classifier>tests</classifier>
+				<scope>test</scope>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>fc2-facility</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>trade-facility</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>starling-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>dbx</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>webservice</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>databases</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>reports-facility</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>starling-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>titan</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>rabbit-event-viewer-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>gui</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>services</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>services</artifactId>
+				<classifier>tests</classifier>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>trade-impl</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>oil</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>metals</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>reports-impl</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>startserver</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>launcher</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>starling</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>instrument</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>osgirun</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.starling</groupId>
+				<artifactId>booter</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		
+			<!-- libraries -->
+			
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>5.7</version>
+				<classifier>jdk15</classifier>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-swing</artifactId>
+				<version>${scala.version}</version>
+			</dependency>  
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>jline</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-partest</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-compiler</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scalap</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+						
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-actors</artifactId>
+				<version>2.4.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-db</artifactId>
+				<version>2.5.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.1.2</version>
+				<!--<version>4.1.3</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.1.2</version>
+				<!--<version>4.1.3</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jfree</groupId>
+				<artifactId>jfreechart</artifactId>
+				<version>${jfree.version}</version>
+				<!--<version>1.0.13</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>jfree</groupId>
+				<artifactId>jcommon</artifactId>
+				<version>${jfree.version}</version>
+				<!--<version>1.0.16</version>-->
+			</dependency>
+						
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-decoder</artifactId>
+				<version>2.7.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-parent</artifactId>
+				<version>2.7.2-rc3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scalatest</groupId>
+				<artifactId>scalatest_2.9.1</artifactId>
+				<version>1.6.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>spy</groupId>
+				<artifactId>spymemcached</artifactId>
+				<version>2.7.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.thoughtworks.xstream</groupId>
+				<artifactId>xstream</artifactId>
+				<version>1.3.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib-nodep</artifactId>
+				<version>2.2</version>
+				<!--<version>2.2.2</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>6.2.1</version>
+				<!--<version>6.3.1</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>2.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>colt</groupId>
+				<artifactId>colt</artifactId>
+				<version>1.0.3</version>
+				<!--<version>1.2.0</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.collections</groupId>
+				<artifactId>google-collections</artifactId>
+				<version>1.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>1.6</version>
+				<!--<version>2.0</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.16</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.rabbitmq</groupId>
+				<artifactId>amqp-client</artifactId>
+				<version>1.7.2</version>
+				<!--<version>2.7.0</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>1.8.2</version>
+				<!--<version>1.8.5</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>1.6.1</version>
+				<!--<version>1.6.4</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>1.3.2</version>
+				<!--<version>2.1</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.scalaz</groupId>
+				<artifactId>scalaz-core_2.9.1</artifactId>
+				<version>6.0.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>scala-stm</artifactId>
+				<version>0.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>scala-stm_2.9.1</artifactId>
+				<version>0.3</version>
+				<!--<version>0.4</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.jmock</groupId>
+				<artifactId>jmock</artifactId>
+				<version>2.5.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-core</artifactId>
+				<version>1.1</version>
+				<!--<version>1.2.1</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-library</artifactId>
+				<version>1.1</version>
+				<!--<version>1.2.1</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>net.liftweb</groupId>
+				<artifactId>lift-json_2.9.0</artifactId>
+				<version>2.4-M2</version>
+				<!--<version>2.4-M5</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>org.osgi.core</artifactId>
+				<version>1.4.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>org.osgi.compendium</artifactId>
+				<version>1.4.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>org.apache.felix.framework</artifactId>
+				<version>4.0.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math</artifactId>
+				<version>2.1</version>
+				<!--<version>2.2</version>-->
+			</dependency>
+			
+			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna</artifactId>
+				<version>3.3.0</version>			
+			</dependency>
+
+			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna</artifactId>
+				<version>3.3.0</version>			
+				<classifier>platform</classifier>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.protobuf</groupId>
+				<artifactId>protobuf-java</artifactId>
+				<version>2.3.0</version>
+				<!--<version>2.4.1</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>net.debasishg</groupId>
+				<artifactId>sjson_2.8.0</artifactId>
+				<version>0.8</version>
+			</dependency>
+			
+			<!--
+			<dependency>
+				<groupId>net.debasishg</groupId>
+				<artifactId>sjson_2.9.1</artifactId>
+				<version>0.15</version>
+			</dependency>
+			-->
+
+			<dependency>
+				<groupId>net.databinder</groupId>
+				<artifactId>dispatch-json_2.8.0</artifactId>
+				<version>0.7.4</version>  
+				<!--<version>0.8.6</version>-->	
+			</dependency>
+
+			<!--
+			<dependency>
+				<groupId>net.databinder</groupId>
+				<artifactId>dispatch-json_2.9.1</artifactId>
+				<version>0.8.6</version>
+			</dependency>
+			-->
+
+			<dependency>
+				<groupId>jxlayer</groupId>
+				<artifactId>jxlayer</artifactId>
+				<version>4.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jgoodies</groupId>
+				<artifactId>looks</artifactId>
+				<version>2.3.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.swinglabs</groupId>
+				<artifactId>swingx-core</artifactId>
+				<version>1.6.2-2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.java.dev.timingframework</groupId>
+				<artifactId>timingframework</artifactId>
+				<version>1.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>transloader</groupId>
+				<artifactId>transloader</artifactId>
+				<version>0.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>mig-swing</groupId>
+				<artifactId>miglayout</artifactId>
+				<version>4.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>starling-external-jars</groupId>
+				<artifactId>org.eclipse.mylyn.wikitext.core</artifactId>
+				<classifier>e3x</classifier>
+				<version>1.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>starling-external-jars</groupId>
+				<artifactId>org.eclipse.mylyn.wikitext.textile.core</artifactId>
+				<version>1.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.codehaus.jettison</groupId>
+				<artifactId>jettison</artifactId>
+				<version>1.1</version>
+				<!--<version>1.3</version>-->	
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.tradinghub</groupId>
+				<artifactId>scala-hub-support</artifactId>
+				<version>2.17</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.tradinghub</groupId>
+				<artifactId>persistence-support</artifactId>
+				<version>2.17</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.0-api</artifactId>
+				<version>1.0.0.Final</version>
+				<!--<version>1.0.1.Final</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-commons-annotations</artifactId>
+				<version>3.2.0.Final</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-annotations</artifactId>
+				<version>3.5.1-Final</version>
+				<!--<version>3.5.6-Final</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-logistics-public-scala-bindings</artifactId>
+				<version>1.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-trademgmt-public-scala-bindings</artifactId>
+				<version>1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-trademgmt-internal-scala-bindings</artifactId>
+				<version>1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-common-public-scala-bindings</artifactId>
+				<version>1.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-common-public-definitions</artifactId>
+				<version>1.0</version>
+				<type>gem</type>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.trafigura.titan</groupId>
+				<artifactId>model-parent</artifactId>
+				<version>1.1</version>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
+				<groupId>com.oracle</groupId>
+				<artifactId>ojdbc6</artifactId>
+				<version>11.2.0.1.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jtds</groupId>
+				<artifactId>jtds</artifactId>
+				<version>1.2.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jolbox</groupId>
+				<artifactId>bonecp</artifactId>
+				<version>0.7.1.RELEASE</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>3.0.5.RELEASE</version>
+				<!--<version>3.0.6.RELEASE</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>2.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.thoughtworks.paranamer</groupId>
+				<artifactId>paranamer</artifactId>
+				<version>2.3</version>
+				<!--<version>2.4</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-util</artifactId>
+				<version>6.1.26</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty</artifactId>
+				<version>6.1.26</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-jaxrs</artifactId>
+				<version>2.2.2.GA</version>
+				<!--<version>2.2.3.GA</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>jaxrs-api</artifactId>
+				<version>2.2.2.GA</version>
+				<!--<version>2.2.3.GA</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>starling-external-jars </groupId>
+				<artifactId>mimapi</artifactId>
+				<version>2.2.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.acplt</groupId>
+				<artifactId>oncrpc</artifactId>
+				<version>1.0.7</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.2.131</version>
+				<!--<version>1.3.162</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>hsqldb</groupId>
+				<artifactId>hsqldb</artifactId>
+				<version>1.8.0.10</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.6.1</version>
+				<!--<version>1.6.4</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.derby</groupId>
+				<artifactId>derby</artifactId>
+				<version>10.5.3.0_1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-tools.testing</groupId>
+				<artifactId>scalacheck_2.9.1</artifactId>
+				<version>1.9</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>3.0.5.RELEASE</version>
+				<!--<version>3.0.6.RELEASE</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>3.0.5.RELEASE</version>
+				<!--<version>3.0.6.RELEASE</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>3.0.5.RELEASE</version>
+				<!--<version>3.0.6.RELEASE</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>3.0.5.RELEASE</version>
+				<!--<version>3.0.6.RELEASE</version>-->
+			</dependency>
+						
+
+			<dependency>
+				<groupId>starling-external-jars</groupId>
+				<artifactId>xlloop</artifactId>
+				<version>0.3.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scannotation</groupId>
+				<artifactId>scannotation</artifactId>
+				<version>1.0.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>3.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.subethamail</groupId>
+				<artifactId>subethasmtp-smtp</artifactId>
+				<version>1.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.subethamail</groupId>
+				<artifactId>subethasmtp-wiser</artifactId>
+				<version>1.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>1.4</version>
+				<!--<version>1.4.4</version>-->
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan.shared-libs</groupId>
+				<artifactId>titan-core</artifactId>
+				<version>1.1</version>
+				<!-- exclude all the transitive dependencies -->
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan.shared-libs</groupId>
+				<artifactId>titan-security</artifactId>
+				<version>1.1</version>
+				<!-- exclude all the transitive dependencies -->
+			</dependency>
+
+			<dependency>
+				<groupId>com.trafigura.titan.shared-libs</groupId>
+				<artifactId>trademgmt-lib</artifactId>
+				<version>1.0</version>
+				<!-- exclude all the transitive dependencies -->
+			</dependency>
+
+			<dependency>
+				<groupId>net.databinder</groupId>
+				<artifactId>dispatch-http_2.9.1</artifactId>
+				<version>0.8.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.databinder</groupId>
+				<artifactId>dispatch-core_2.9.1</artifactId>
+				<version>0.8.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>biz.aQute</groupId>
+				<artifactId>bndlib</artifactId>
+				<version>1.50.0</version>
+				<!-- not sure about the version -->
+			</dependency>
+        </dependencies>
+	</dependencyManagement>
+	
     <modules>
         <module>core</module>
         <module>app1</module>
         <module>app2</module>
     </modules>
-    <profiles>
+    
+	<profiles>
         <profile>
             <id>multimodule-tag-modules</id>
             <build>
