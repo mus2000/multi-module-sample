@@ -8,7 +8,7 @@ public class App1 {
 		
 		core.core();
 		
-		System.out.println("method one invoked");
+		System.out.println("method one invoked change");
 	}
 	
 }
