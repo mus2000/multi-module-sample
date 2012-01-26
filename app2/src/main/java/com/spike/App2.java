@@ -5,7 +5,7 @@ public class App2 {
 	private App1 app1;
 	
 	public void method2() {
-		app1.method1();
+		app1.method1Mod();
 	}
 	
 	public void method2B() {
