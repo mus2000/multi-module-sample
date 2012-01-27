@@ -287,7 +287,12 @@
 				<artifactId>app2</artifactId>
 				<version>1.12-SNAPSHOT</version>
 			</dependency>
-		
+			
+			<dependency>
+				<groupId>de.friedenhagen.multimodule</groupId>
+				<artifactId>app3</artifactId>
+				<version>1.12-SNAPSHOT</version>
+			</dependency>
 		
 			<!-- starling modules -->
 			<dependency>
@@ -1250,6 +1255,7 @@
         <module>core</module>
         <module>app1</module>
         <module>app2</module>
+        <module>app3</module>
     </modules>
     
 	<profiles>
